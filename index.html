@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OilGuru™">
+<meta name="theme-color" content="#1B2A4A">
+<title>OilGuru™ Alam Enterprises – Dealer App</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--navy:#1B2A4A;--navy2:#243566;--gold:#D4A017;--gold-l:#F0C030;--gold-pale:#FDF6E3;--white:#fff;--bg:#F4F6FA;--card:#fff;--text:#1a1a2e;--muted:#7a7a9a;--border:#e0e4f0;--green:#1A6B3C;--green-bg:#e8f8ee;--red:#c0392b;--red-bg:#fdecea;--radius:12px;--safe-b:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0d1b35,#1B2A4A 50%,#1a3a6e);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:32px 24px;overflow-y:auto}
+.login-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),#f5a623);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 32px rgba(212,160,23,.4);margin:0 auto 20px}
+.login-title{font-size:28px;font-weight:800;color:#fff;text-align:center;line-height:1.1}
+.login-title sup{font-size:11px;color:var(--gold);vertical-align:super}
+.login-sub{font-size:12px;color:rgba(255,255,255,.5);text-align:center;margin-top:6px;letter-spacing:.5px}
+.login-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 24px;width:100%;max-width:360px;margin-top:28px;backdrop-filter:blur(12px)}
+.login-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block}
+.login-input-f{width:100%;padding:13px 15px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:15px;outline:none;transition:border .2s;margin-bottom:0}
+.login-input-f:focus{border-color:var(--gold)}
+.login-input-f::placeholder{color:rgba(255,255,255,.3)}
+.login-btn{width:100%;margin-top:14px;padding:15px;background:linear-gradient(135deg,var(--gold),#e6a800);color:#000;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 20px rgba(212,160,23,.35)}
+.login-btn:active{transform:scale(.98)}
+.login-error{color:#ff6b6b;font-size:13px;text-align:center;margin-top:10px;min-height:18px}
+.login-footer{margin-top:24px;font-size:11px;color:rgba(255,255,255,.3);text-align:center;line-height:1.6}
+/* dealer detected card */
+.dealer-detected{background:rgba(39,174,96,.15);border:1.5px solid rgba(39,174,96,.4);border-radius:12px;padding:12px 16px;margin-top:14px;display:none}
+.dealer-detected-name{font-size:16px;font-weight:800;color:#6fcf97}
+.dealer-detected-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+/* retail warning */
+.retail-warning{background:rgba(212,160,23,.12);border:1.5px solid rgba(212,160,23,.35);border-radius:12px;padding:12px 16px;margin-top:14px;display:none}
+.retail-warning-title{font-size:13px;font-weight:700;color:var(--gold)}
+.retail-warning-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
+.retail-wa-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;width:100%;margin-top:10px;cursor:pointer;text-decoration:none}
+/* retail mode bar */
+.retail-mode-bar{background:linear-gradient(90deg,#7B3F00,#c0392b);padding:8px 14px;font-size:12px;color:#fff;font-weight:700;text-align:center}
+
+/* APP SHELL */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.visible{display:flex}
+.top-nav{position:sticky;top:0;z-index:100;background:var(--navy);padding:10px 14px 10px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.nav-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.nav-brand{font-size:17px;font-weight:800;color:#fff;line-height:1}
+.nav-brand sup{font-size:8px;color:var(--gold);vertical-align:super}
+.nav-sub{font-size:9px;color:rgba(255,255,255,.45);margin-top:1px}
+.nav-right{display:flex;align-items:center;gap:8px}
+.cart-btn{position:relative;background:var(--gold);border:none;color:#000;font-size:13px;font-weight:700;padding:7px 14px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.cart-badge{position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+.nav-logout{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);font-size:11px;padding:6px 10px;border-radius:20px;cursor:pointer;font-weight:600}
+.search-wrap{position:relative}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.35);font-size:14px;pointer-events:none}
+#search-input{width:100%;padding:9px 11px 9px 33px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.13);border-radius:9px;color:#fff;font-size:13px;outline:none;transition:border .2s}
+#search-input:focus{border-color:var(--gold);background:rgba(255,255,255,.14)}
+#search-input::placeholder{color:rgba(255,255,255,.32)}
+.dealer-bar{background:var(--gold-pale);border-bottom:1px solid #e8d99a;padding:7px 14px;font-size:12px;color:#7a5c00;font-weight:600}
+.cat-tabs-wrap{background:var(--white);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:0 4px}
+.cat-tabs-wrap::-webkit-scrollbar{display:none}
+.cat-tab{display:inline-block;padding:11px 13px 9px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.cat-tab.active{color:var(--navy);border-bottom-color:var(--gold)}
+.result-bar{padding:7px 14px 3px;font-size:11px;color:var(--muted);font-weight:500}
+.result-bar span{color:var(--navy);font-weight:700}
+.discount-banner{margin:6px 12px 2px;background:linear-gradient(90deg,#1A6B3C,#27ae60);border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:#fff;font-weight:600}
+.product-list{padding:4px 10px 100px;flex:1}
+.group-header{display:flex;align-items:center;gap:8px;padding:12px 4px 5px}
+.group-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy)}
+.group-count{font-size:10px;color:var(--muted);background:var(--border);padding:1px 7px;border-radius:20px}
+.p-card{background:var(--card);border-radius:var(--radius);margin-bottom:7px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.p-card-inner{display:flex;align-items:stretch}
+.p-card-accent{width:4px;flex-shrink:0}
+.p-card-body{flex:1;padding:10px 10px 10px 11px}
+.p-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:4px}
+.p-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.badge.pack{background:#e8f0fe;color:#1a56db;border-color:#c3d3fb}
+.p-card-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;padding:10px 10px 10px 6px;min-width:100px;border-left:1px solid var(--border);gap:6px}
+.price-mrp{font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap}
+.price-mrp-label{font-size:9px;color:var(--muted);font-weight:600;text-align:right}
+.price-dlp{font-size:11px;font-weight:700;color:var(--green);white-space:nowrap}
+.price-dlp-label{font-size:9px;color:var(--muted);font-weight:600;text-align:right}
+.add-btn{background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;white-space:nowrap}
+.add-btn:active{background:var(--navy2)}
+.qty-ctrl{display:flex;align-items:center;gap:4px}
+.qty-ctrl button{background:var(--border);border:none;width:26px;height:26px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)}
+.qty-ctrl .minus{background:#fdecea;color:var(--red)}
+.qty-ctrl .plus{background:var(--green-bg);color:var(--green)}
+.qty-val{font-size:13px;font-weight:700;min-width:22px;text-align:center}
+.no-results{text-align:center;padding:60px 20px;color:var(--muted)}
+.no-results-icon{font-size:44px;margin-bottom:12px}
+.no-results-text{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--navy);padding:8px 16px calc(8px + var(--safe-b));display:flex;justify-content:space-around;box-shadow:0 -2px 12px rgba(0,0,0,.15)}
+.stat-item{text-align:center}
+.stat-num{font-size:14px;font-weight:800;color:var(--gold)}
+.stat-lbl{font-size:9px;color:rgba(255,255,255,.45);letter-spacing:.5px;font-weight:600;text-transform:uppercase}
+
+/* PANELS */
+.panel-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;backdrop-filter:blur(3px)}
+.panel-overlay.open{display:block}
+.panel{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-radius:22px 22px 0 0;z-index:201;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;display:flex;flex-direction:column}
+.panel.open{transform:translateY(0)}
+.panel-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0}
+.panel-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.panel-title{font-size:18px;font-weight:800;color:var(--text)}
+.panel-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.panel-body{overflow-y:auto;flex:1;padding:0 14px 10px}
+.panel-footer{padding:12px 14px calc(12px + var(--safe-b));border-top:1px solid var(--border);flex-shrink:0;background:var(--white)}
+
+/* CART */
+.cart-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.cart-item:last-child{border-bottom:none}
+.cart-accent{width:3px;height:40px;border-radius:2px;flex-shrink:0}
+.cart-info{flex:1}
+.cart-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.cart-pack{font-size:11px;color:var(--muted);margin-top:2px}
+.cart-line-price{font-size:12px;font-weight:700;color:var(--navy);margin-top:3px}
+.cart-qty{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.cart-qty button{background:var(--border);border:none;width:28px;height:28px;border-radius:7px;font-size:16px;font-weight:700;cursor:pointer;color:var(--text)}
+.cart-qty .minus{background:#fdecea;color:var(--red)}
+.cart-qty .plus{background:var(--green-bg);color:var(--green)}
+.cart-qty-val{font-size:14px;font-weight:700;min-width:22px;text-align:center}
+.summary-box{background:var(--bg);border-radius:12px;padding:12px 14px;margin:10px 0}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.summary-row.divider{border-top:1px solid var(--border);padding-top:10px;margin-top:5px}
+.summary-label{font-size:13px;color:var(--muted);font-weight:500}
+.summary-value{font-size:13px;font-weight:700;color:var(--text)}
+.summary-discount{color:var(--green)}
+.summary-total{font-size:16px;font-weight:800;color:var(--navy)}
+.summary-total-lbl{font-size:14px;font-weight:700;color:var(--navy)}
+.disc-chip{background:var(--green-bg);color:var(--green);border:1px solid #a8dfc0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px;display:inline-block;margin-top:4px}
+.empty-cart{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-cart-icon{font-size:48px;margin-bottom:12px}
+.pay-toggle{display:flex;gap:8px;margin:10px 0}
+.pay-opt{flex:1;padding:10px;border:2px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s}
+.pay-opt.selected{border-color:var(--navy);background:#eef1ff}
+.pay-opt-icon{font-size:20px;margin-bottom:3px}
+.pay-opt-label{font-size:11px;font-weight:700;color:var(--text)}
+.pay-opt-sub{font-size:10px;color:var(--muted)}
+.pay-opt.selected .pay-opt-label{color:var(--navy)}
+.section-lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:14px 0 6px;display:block}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;font-size:14px;font-weight:700;border:none;border-radius:11px;cursor:pointer;margin-top:8px}
+.btn-primary:active{transform:scale(.98)}
+.btn-gold{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#e6a800);color:#000;font-size:14px;font-weight:700;border:none;border-radius:11px;cursor:pointer;margin-top:8px}
+.btn-green{width:100%;padding:14px;background:linear-gradient(135deg,#1A6B3C,#27ae60);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:11px;cursor:pointer;margin-top:8px}
+.btn-secondary{width:100%;padding:13px;background:transparent;color:var(--navy);font-size:13px;font-weight:700;border:2px solid var(--border);border-radius:11px;cursor:pointer;margin-top:8px}
+
+/* UPI */
+.upi-amount-box{background:linear-gradient(135deg,#eef1ff,#dce4ff);border:1px solid #c5d0ff;border-radius:12px;padding:14px;text-align:center;margin:12px 0}
+.upi-amount{font-size:28px;font-weight:900;color:var(--navy)}
+.upi-amount-label{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+.upi-qr-wrap{text-align:center;padding:12px 0 6px}
+.qr-box{width:180px;height:180px;background:var(--bg);border:2px solid var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto;font-size:12px;color:var(--muted)}
+.upi-id-box{background:var(--bg);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin:10px 0}
+.upi-id-text{font-size:13px;font-weight:700;color:var(--text)}
+.upi-id-label{font-size:10px;color:var(--muted)}
+.copy-btn{background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;padding:6px 12px;cursor:pointer}
+.upi-apps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.upi-app-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 4px;cursor:pointer;text-decoration:none;transition:background .15s}
+.upi-app-btn:active{background:var(--border)}
+.upi-app-icon{font-size:24px}
+.upi-app-name{font-size:10px;font-weight:600;color:var(--text)}
+.upi-steps{background:#fffbea;border:1px solid #f0d060;border-radius:10px;padding:10px 14px;margin:8px 0;font-size:12px;color:#7a5c00;line-height:1.9}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:28px 20px 8px}
+.success-icon{font-size:64px;margin-bottom:14px;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.success-title{font-size:22px;font-weight:800;color:var(--green);margin-bottom:8px}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.success-order-box{background:var(--green-bg);border:1px solid #a8dfc0;border-radius:12px;padding:14px;text-align:left;margin-bottom:16px}
+.success-order-title{font-size:11px;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.success-order-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--text)}
+
+
+/* NUDGE BOXES */
+.nudge-box{border-radius:10px;padding:10px 13px;margin:10px 0;font-size:12px;line-height:1.5}
+.nudge-box span{font-size:11px;opacity:.85}
+.nudge-green{background:var(--green-bg);border:1px solid #a8dfc0;color:#1A6B3C}
+.nudge-blue{background:#e8f0fe;border:1px solid #c3d3fb;color:#1a56db}
+.nudge-orange{background:#fff3e0;border:1px solid #ffcc80;color:#7B3F00}
+
+/* ADD TO HOME SCREEN BANNER */
+#a2hs-banner{
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:linear-gradient(135deg,#0d1b35,#1B2A4A);
+  border-top:2px solid var(--gold);
+  padding:12px 16px calc(12px + var(--safe-b));
+  display:none;
+  animation:slideUp .4s cubic-bezier(.32,.72,0,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.a2hs-inner{display:flex;align-items:center;gap:12px}
+.a2hs-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),#f5a623);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.a2hs-text{flex:1}
+.a2hs-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:2px}
+.a2hs-sub{font-size:11px;color:rgba(255,255,255,.55);line-height:1.4}
+.a2hs-btn{background:var(--gold);color:#000;border:none;border-radius:8px;font-size:12px;font-weight:800;padding:8px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.a2hs-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;line-height:1}
+/* iOS instruction sheet */
+#ios-sheet{position:fixed;inset:0;z-index:600;display:none}
+#ios-sheet.open{display:block}
+.ios-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.ios-card{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px calc(20px + var(--safe-b));animation:slideUp .3s ease}
+.ios-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 18px}
+.ios-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px}
+.ios-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.ios-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+.ios-step{display:flex;align-items:center;gap:12px}
+.ios-step-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ios-step-text{font-size:13px;color:var(--text);line-height:1.4}
+.ios-step-text b{color:var(--navy)}
+.ios-arrow{position:fixed;bottom:calc(16px + var(--safe-b));left:50%;transform:translateX(-50%);font-size:28px;animation:bounce .8s infinite alternate}
+@keyframes bounce{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(8px)}}
+.ios-close-btn{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer}
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+mark{background:rgba(212,160,23,.3);color:inherit;border-radius:2px;padding:0 1px}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-icon">🛢️</div>
+  <div class="login-title">OilGuru<sup>TM</sup><br>Alam Enterprises</div>
+  <div class="login-sub">AUTHORISED DISTRIBUTOR · LUCKNOW</div>
+  <div class="login-card">
+    <label class="login-label">Enter Your Mobile Number</label>
+    <input class="login-input-f" id="mobile-input" type="tel" maxlength="10"
+      placeholder="10-digit mobile number"
+      oninput="onMobileInput(this.value)"
+      onkeydown="if(event.key==='Enter')doLogin()"
+      autocomplete="tel" inputmode="numeric">
+
+    <!-- Dealer detected -->
+    <div class="dealer-detected" id="dealer-detected">
+      <div class="dealer-detected-name" id="detected-name">—</div>
+      <div class="dealer-detected-sub">✅ Registered Dealer — Dealer prices unlocked</div>
+    </div>
+
+    <!-- Unknown number warning -->
+    <div class="retail-warning" id="retail-warning">
+      <div class="retail-warning-title">⚠️ Number not registered as dealer</div>
+      <div class="retail-warning-sub">You'll be able to browse at MRP prices.<br>To become a dealer, contact OilGuru Alam Enterprises.</div>
+      <a class="retail-wa-btn" id="retail-wa-link" href="#" target="_blank">
+        💬 Contact on WhatsApp to become a Dealer
+      </a>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()" disabled style="opacity:.5">ENTER PRICE LIST →</button>
+    <div class="login-error" id="login-err"></div>
+  </div>
+  <div class="login-footer">OilGuru™ Alam Enterprises · Lucknow, UP<br>GST: 09AJJPA7779E1ZX · +91 94552 52049<br><br>Dealers: contact us on WhatsApp to register</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="top-nav">
+    <div class="nav-row1">
+      <div>
+        <div class="nav-brand">OilGuru<sup>TM</sup> Alam Enterprises</div>
+        <div class="nav-sub">Price List 2026 · Lucknow</div>
+      </div>
+      <div class="nav-right">
+        <button class="cart-btn" onclick="openCart()">🛒 Cart<span class="cart-badge" id="cart-badge" style="display:none">0</span></button>
+        <button class="nav-logout" onclick="doLogout()">✕</button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="search-input" type="search" placeholder="Search product, grade, item ID…" oninput="renderList()" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+  </div>
+  <div class="retail-mode-bar" id="retail-mode-bar" style="display:none">🛍️ Browsing as Retail Customer — Showing MRP prices only. Contact us to become a dealer!</div>
+  <div class="dealer-bar" id="dealer-bar">👤 Welcome! Browse products and tap + to add to cart.</div>
+  <div class="cat-tabs-wrap" id="cat-tabs"></div>
+  <div class="discount-banner" id="discount-banner" style="display:none">🏷️ <span id="discount-banner-text"></span></div>
+  <div class="result-bar" id="result-bar"></div>
+  <div class="product-list" id="product-list"></div>
+  <div class="bottom-nav">
+    <div class="stat-item"><div class="stat-num" id="cart-total-nav">Rs. 0</div><div class="stat-lbl">Cart Total</div></div>
+    <div class="stat-item"><div class="stat-num" id="cart-items-nav">0</div><div class="stat-lbl">Items</div></div>
+    <div class="stat-item"><div class="stat-num">169</div><div class="stat-lbl">Products</div></div>
+  </div>
+</div>
+
+<!-- CART PANEL -->
+<div class="panel-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="panel" id="cart-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-header"><div class="panel-title">🛒 Your Cart</div><div class="panel-sub" id="cart-panel-sub">0 items</div></div>
+  <div class="panel-body" id="cart-body"></div>
+  <div class="panel-footer" id="cart-footer"></div>
+</div>
+
+<!-- UPI PANEL -->
+<div class="panel-overlay" id="upi-overlay" onclick="closeUpi()"></div>
+<div class="panel" id="upi-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-header"><div class="panel-title">💳 Pay via UPI</div><div class="panel-sub">Scan or use UPI app</div></div>
+  <div class="panel-body" id="upi-body"></div>
+  <div class="panel-footer" id="upi-footer"></div>
+</div>
+
+<!-- SUCCESS PANEL -->
+<div class="panel-overlay" id="success-overlay"></div>
+<div class="panel" id="success-panel">
+  <div class="panel-handle"></div>
+  <div class="panel-body" id="success-body"></div>
+  <div class="panel-footer" id="success-footer"></div>
+</div>
+
+<script>
+const PASSWORD   = 'oilguru2026';
+const WA_NUMBER  = '919519252049';
+const UPI_ID     = '9519252049@okbizaxis';
+const UPI_NAME   = 'OilGuru Alam Enterprises';
+const DISC_RULES = [{min:10000,pct:5},{min:5000,pct:3}];
+
+const CATS=[
+  {key:'all',label:'All',color:'#1B2A4A'},
+  {key:'engine',label:'Engine Oils',color:'#1B2A4A'},
+  {key:'trans',label:'Transmission & Gear',color:'#2C3E6B'},
+  {key:'engine_add',label:'Engine Additives',color:'#3B5249'},
+  {key:'petrol',label:'Petrol Additives',color:'#7B3F00'},
+  {key:'diesel',label:'Diesel & DPF',color:'#4A3800'},
+  {key:'coolant',label:'Coolant & Radiator',color:'#1A4A5E'},
+  {key:'brake',label:'Brake Fluids',color:'#6B1B1B'},
+  {key:'car_care',label:'Car Care & A/C',color:'#3B3060'},
+  {key:'mco_oil',label:'Motorbike Oils',color:'#1B3A1B'},
+  {key:'mco_add',label:'Bike Additives',color:'#2A3B1B'},
+  {key:'mco_care',label:'Bike Care',color:'#1B2A3A'},
+];
+const catColor=k=>(CATS.find(c=>c.key===k)||{color:'#1B2A4A'}).color;
+const catLabel=k=>(CATS.find(c=>c.key===k)||{label:k}).label;
+
+const P=[
+  {id:21410,name:"Top Tec 6600 SAE 0W-20",pack:"1LTR",std:6,dlp:1290,mrp:1744,cat:'engine'},
+  {id:21411,name:"Top Tec 6600 SAE 0W-20",pack:"5LTR",std:4,dlp:5627,mrp:7727,cat:'engine'},
+  {id:20787,name:"Top Tec 6200 0W-20",pack:"1LTR",std:6,dlp:1430,mrp:1935,cat:'engine'},
+  {id:20789,name:"Top Tec 6200 0W-20",pack:"5LTR",std:4,dlp:5838,mrp:8015,cat:'engine'},
+  {id:20777,name:"Top Tec 6100 0W-30",pack:"1LTR",std:6,dlp:1410,mrp:1907,cat:'engine'},
+  {id:20779,name:"Top Tec 6100 0W-30",pack:"5LTR",std:4,dlp:6460,mrp:8740,cat:'engine'},
+  {id:8972,name:"Top Tec 4200 5W-30 New Generation",pack:"1LTR",std:6,dlp:1402,mrp:1896,cat:'engine'},
+  {id:8973,name:"Top Tec 4200 5W-30 New Generation",pack:"5LTR",std:4,dlp:5327,mrp:7904,cat:'engine'},
+  {id:9510,name:"Top Tec 4100 5W-40",pack:"1LTR",std:6,dlp:1199,mrp:1671,cat:'engine'},
+  {id:9511,name:"Top Tec 4100 5W-40",pack:"5LTR",std:4,dlp:4785,mrp:7100,cat:'engine'},
+  {id:3703,name:"Top Tec 4100 5W-40",pack:"60LTR",std:1,dlp:50741,mrp:null,cat:'engine'},
+  {id:9514,name:"Synthoil Energy 0W-40",pack:"1LTR",std:12,dlp:1326,mrp:1743,cat:'engine'},
+  {id:2451,name:"Synthoil Energy 0W-40",pack:"4LTR",std:4,dlp:4725,mrp:6488,cat:'engine'},
+  {id:1855,name:"Synthoil High Tech 5W-40",pack:"1LTR",std:12,dlp:1251,mrp:1692,cat:'engine'},
+  {id:1856,name:"Synthoil High Tech 5W-40",pack:"5LTR",std:4,dlp:5726,mrp:7746,cat:'engine'},
+  {id:8908,name:"Synthoil Race Tech GT1 10W-60",pack:"1LTR",std:6,dlp:1470,mrp:1708,cat:'engine'},
+  {id:8909,name:"Synthoil Race Tech GT1 10W-60",pack:"5LTR",std:4,dlp:5897,mrp:8346,cat:'engine'},
+  {id:9506,name:"Longtime High Tech 5W-30",pack:"1LTR",std:12,dlp:1172,mrp:1585,cat:'engine'},
+  {id:9507,name:"Longtime High Tech 5W-30",pack:"5LTR",std:4,dlp:5319,mrp:7196,cat:'engine'},
+  {id:21356,name:"Molygen New Generation 0W-20",pack:"1LTR",std:12,dlp:1130,mrp:1528,cat:'engine'},
+  {id:21357,name:"Molygen New Generation 0W-20",pack:"4LTR",std:4,dlp:3955,mrp:5349,cat:'engine'},
+  {id:9047,name:"Molygen New Generation 5W-30",pack:"1LTR",std:6,dlp:1087,mrp:1488,cat:'engine'},
+  {id:9089,name:"Molygen New Generation 5W-30",pack:"4LTR",std:4,dlp:3554,mrp:5273,cat:'engine'},
+  {id:8576,name:"Molygen New Generation 5W-40",pack:"1LTR",std:12,dlp:1110,mrp:1562,cat:'engine'},
+  {id:8578,name:"Molygen New Generation 5W-40",pack:"4LTR",std:4,dlp:3621,mrp:5539,cat:'engine'},
+  {id:9056,name:"Molygen New Generation 5W-40",pack:"60LTR",std:1,dlp:51923,mrp:null,cat:'engine'},
+  {id:21883,name:"Leichtlauf Performance 0W-20",pack:"1LTR",std:12,dlp:765,mrp:1073,cat:'engine'},
+  {id:21887,name:"Leichtlauf Performance 0W-20",pack:"4LTR",std:4,dlp:2624,mrp:3681,cat:'engine'},
+  {id:21363,name:"Leichtlauf Performance 5W-30",pack:"1LTR",std:12,dlp:869,mrp:1115,cat:'engine'},
+  {id:21592,name:"Leichtlauf Performance 5W-30",pack:"4LTR",std:4,dlp:2540,mrp:4076,cat:'engine'},
+  {id:21367,name:"Leichtlauf Performance 5W-40",pack:"1LTR",std:12,dlp:888,mrp:1241,cat:'engine'},
+  {id:21593,name:"Leichtlauf Performance 5W-40",pack:"4LTR",std:4,dlp:2945,mrp:4459,cat:'engine'},
+  {id:21452,name:"Leichtlauf Performance 5W-40",pack:"60LTR",std:1,dlp:42142,mrp:null,cat:'engine'},
+  {id:2338,name:"Leichtlauf Performance 10W-40",pack:"1LTR",std:12,dlp:606,mrp:794,cat:'engine'},
+  {id:8998,name:"Leichtlauf Performance 10W-40",pack:"4LTR",std:4,dlp:2085,mrp:2696,cat:'engine'},
+  {id:21326,name:"Special Tec AA 0W-16",pack:"1LTR",std:6,dlp:1213,mrp:1641,cat:'engine'},
+  {id:21327,name:"Special Tec AA 0W-16",pack:"4LTR",std:4,dlp:4179,mrp:5652,cat:'engine'},
+  {id:20631,name:"Special Tec V 0W-20",pack:"1LTR",std:6,dlp:1278,mrp:1727,cat:'engine'},
+  {id:20632,name:"Special Tec V 0W-20",pack:"5LTR",std:4,dlp:5651,mrp:7645,cat:'engine'},
+  {id:6738,name:"Special Tec AA 0W-20",pack:"1LTR",std:6,dlp:1035,mrp:1400,cat:'engine'},
+  {id:9705,name:"Special Tec AA 0W-20",pack:"4LTR",std:4,dlp:3719,mrp:5031,cat:'engine'},
+  {id:8902,name:"Special Tec F 0W-30",pack:"1LTR",std:6,dlp:1520,mrp:2056,cat:'engine'},
+  {id:8903,name:"Special Tec F 0W-30",pack:"5LTR",std:4,dlp:6256,mrp:8463,cat:'engine'},
+  {id:2325,name:"Special Tec F 5W-30",pack:"1LTR",std:6,dlp:1269,mrp:1716,cat:'engine'},
+  {id:2326,name:"Special Tec F 5W-30",pack:"5LTR",std:4,dlp:5426,mrp:7340,cat:'engine'},
+  {id:20967,name:"Special Tec DX1 5W-30",pack:"1LTR",std:6,dlp:1018,mrp:1757,cat:'engine'},
+  {id:20968,name:"Special Tec DX1 5W-30",pack:"4LTR",std:4,dlp:2711,mrp:5282,cat:'engine'},
+  {id:48339,name:"Special Tec T3200 5W-30",pack:"1 LTR",std:12,dlp:538,mrp:966,cat:'engine'},
+  {id:48387,name:"Special Tec T3200 5W-30",pack:"3.5 LTR",std:6,dlp:1767,mrp:3173,cat:'engine'},
+  {id:48340,name:"Special Tec T3200 5W-30",pack:"4 LTR",std:6,dlp:1966,mrp:3532,cat:'engine'},
+  {id:48351,name:"Special Tec T3600 5W-30",pack:"1 LTR",std:12,dlp:621,mrp:1114,cat:'engine'},
+  {id:48355,name:"Special Tec T3600 5W-30",pack:"3.5 LTR",std:6,dlp:2061,mrp:3702,cat:'engine'},
+  {id:48352,name:"Special Tec T3600 5W-30",pack:"4 LTR",std:6,dlp:2300,mrp:4131,cat:'engine'},
+  {id:48341,name:"Special Tec T3210 0W-20",pack:"1 LTR",std:12,dlp:532,mrp:954,cat:'engine'},
+  {id:48356,name:"Special Tec T3210 0W-20",pack:"3.5 LTR",std:6,dlp:1747,mrp:3138,cat:'engine'},
+  {id:48345,name:"Special Tec T3410 5W-40",pack:"1 LTR",std:12,dlp:598,mrp:1074,cat:'engine'},
+  {id:48354,name:"Special Tec T3410 5W-40",pack:"3.5 LTR",std:6,dlp:1980,mrp:3557,cat:'engine'},
+  {id:48346,name:"Special Tec T3410 5W-40",pack:"4 LTR",std:6,dlp:2209,mrp:3968,cat:'engine'},
+  {id:3925,name:"Optimal Synth 5W-40",pack:"1LTR",std:6,dlp:857,mrp:1184,cat:'engine'},
+  {id:3926,name:"Optimal Synth 5W-40",pack:"4LTR",std:4,dlp:2443,mrp:4412,cat:'engine'},
+  {id:2570,name:"MoS2 Low-Friction 15W-40",pack:"1LTR",std:12,dlp:1007,mrp:1362,cat:'engine'},
+  {id:2571,name:"MoS2 Low-Friction 15W-40",pack:"5LTR",std:4,dlp:4246,mrp:5744,cat:'engine'},
+  {id:3640,name:"Dual Clutch Transmission Oil 8100",pack:"1LTR",std:6,dlp:1375,mrp:1807,cat:'trans'},
+  {id:20626,name:"Dual Clutch Transmission Oil 8100",pack:"5LTR",std:4,dlp:6310,mrp:8292,cat:'trans'},
+  {id:3681,name:"Top Tec ATF 1200",pack:"1LTR",std:6,dlp:1286,mrp:1820,cat:'trans'},
+  {id:3662,name:"Top Tec ATF 1400",pack:"1LTR",std:6,dlp:1424,mrp:2015,cat:'trans'},
+  {id:3659,name:"Top Tec ATF 1600",pack:"1LTR",std:6,dlp:1951,mrp:2630,cat:'trans'},
+  {id:21176,name:"Top Tec ATF 1600",pack:"5LTR",std:4,dlp:9569,mrp:12946,cat:'trans'},
+  {id:3687,name:"Top Tec ATF 1800",pack:"1LTR",std:6,dlp:1118,mrp:1581,cat:'trans'},
+  {id:20662,name:"Top Tec ATF 1800",pack:"5LTR",std:4,dlp:4882,mrp:6824,cat:'trans'},
+  {id:3648,name:"Top Tec ATF 1900",pack:"1LTR",std:6,dlp:1412,mrp:1999,cat:'trans'},
+  {id:21378,name:"Top Tec ATF 1950",pack:"1LTR",std:6,dlp:1356,mrp:1918,cat:'trans'},
+  {id:20842,name:"Top Tec MTF 5100 75W",pack:"1LTR",std:6,dlp:1636,mrp:2316,cat:'trans'},
+  {id:20845,name:"Top Tec MTF 5200 75W-80",pack:"1LTR",std:6,dlp:1678,mrp:2374,cat:'trans'},
+  {id:21791,name:"Top Tec MTF 5400 75W-90",pack:"1LTR",std:6,dlp:2068,mrp:2926,cat:'trans'},
+  {id:1414,name:"Fully Synthetic Gear Oil GL5 75W90",pack:"1LTR",std:6,dlp:2153,mrp:3046,cat:'trans'},
+  {id:1035,name:"Hypoid Gear Oil (GL5) SAE 85W-90",pack:"1LTR",std:6,dlp:1505,mrp:2128,cat:'trans'},
+  {id:1127,name:"Central Hydraulic System Oil",pack:"1LTR",std:6,dlp:1617,mrp:2288,cat:'trans'},
+  {id:5135,name:"ATF Additive",pack:"250ML",std:6,dlp:1489,mrp:2008,cat:'trans'},
+  {id:3321,name:"Transmission Cleaner",pack:"150ML",std:6,dlp:634,mrp:936,cat:'trans'},
+  {id:2512,name:"Automatic Transmission Cleaner",pack:"300ML",std:6,dlp:948,mrp:1399,cat:'trans'},
+  {id:1040,name:"Gear Oil Additive",pack:"20GM",std:12,dlp:498,mrp:722,cat:'trans'},
+  {id:2587,name:"Oil Treatment",pack:"300ML",std:20,dlp:647,mrp:1213,cat:'engine_add'},
+  {id:3721,name:"Cera Tec",pack:"300ML",std:6,dlp:1505,mrp:2835,cat:'engine_add'},
+  {id:7178,name:"MOS2 Oil Additive",pack:"200ML",std:12,dlp:912,mrp:1226,cat:'engine_add'},
+  {id:2657,name:"Engine Flush Plus",pack:"300ML",std:20,dlp:569,mrp:1000,cat:'engine_add'},
+  {id:1802,name:"Motor Oil Saver",pack:"300ML",std:20,dlp:809,mrp:1021,cat:'engine_add'},
+  {id:8360,name:"Oil Smoke Stop",pack:"300ML",std:20,dlp:858,mrp:1424,cat:'engine_add'},
+  {id:1015,name:"Molygen Motor Protect",pack:"500ML",std:6,dlp:2497,mrp:3319,cat:'engine_add'},
+  {id:1019,name:"Motor Clean",pack:"500ML",std:6,dlp:1530,mrp:2222,cat:'engine_add'},
+  {id:1018,name:"Motor Protect",pack:"500ML",std:6,dlp:2578,mrp:3743,cat:'engine_add'},
+  {id:7110,name:"Catalytic-System Clean",pack:"300ML",std:20,dlp:647,mrp:939,cat:'engine_add'},
+  {id:2427,name:"Pro-Line Engine Flush",pack:"500ML",std:6,dlp:715,mrp:1124,cat:'engine_add'},
+  {id:3720,name:"Speed Tec Gasoline",pack:"250ML",std:6,dlp:792,mrp:1169,cat:'petrol'},
+  {id:21492,name:"Gasoline Engine System Cleaner",pack:"300ML",std:6,dlp:929,mrp:1347,cat:'petrol'},
+  {id:1014,name:"Valve Clean",pack:"150ML",std:6,dlp:500,mrp:674,cat:'petrol'},
+  {id:8351,name:"Octane Plus",pack:"150ML",std:20,dlp:617,mrp:880,cat:'petrol'},
+  {id:2817,name:"Petrol Stabiliser CNG/LPG",pack:"250ML",std:6,dlp:966,mrp:1302,cat:'petrol'},
+  {id:2522,name:"Injection Cleaner",pack:"300ML",std:12,dlp:533,mrp:979,cat:'petrol'},
+  {id:5111,name:"Pro-Line Throttle Valve Cleaner",pack:"400ML",std:6,dlp:1389,mrp:2017,cat:'petrol'},
+  {id:1808,name:"Diesel Smoke Stop",pack:"150ML",std:12,dlp:656,mrp:952,cat:'diesel'},
+  {id:2146,name:"Diesel Particulate Filter Protector",pack:"250ML",std:12,dlp:621,mrp:902,cat:'diesel'},
+  {id:3722,name:"Speed Tec Diesel",pack:"250ML",std:6,dlp:790,mrp:1166,cat:'diesel'},
+  {id:1806,name:"Super Diesel Additive",pack:"250ML",std:20,dlp:522,mrp:885,cat:'diesel'},
+  {id:1811,name:"Diesel Purge",pack:"500ML",std:20,dlp:836,mrp:1438,cat:'diesel'},
+  {id:21491,name:"Diesel Engine System Cleaner",pack:"300ML",std:6,dlp:1300,mrp:1752,cat:'diesel'},
+  {id:5156,name:"Pro-Line Diesel System Cleaner",pack:"500ML",std:6,dlp:1619,mrp:2392,cat:'diesel'},
+  {id:5123,name:"Pro-Line Diesel Particulate Filter Protection",pack:"1LTR",std:6,dlp:1226,mrp:1779,cat:'diesel'},
+  {id:5168,name:"Pro-Line Intake System Cleaner Diesel",pack:"400ML",std:6,dlp:1175,mrp:1705,cat:'diesel'},
+  {id:5169,name:"Pro-Line Diesel Particulate Filter Cleaner",pack:"1LTR",std:6,dlp:1460,mrp:2375,cat:'diesel'},
+  {id:5171,name:"Pro-Line Diesel Particulate Filter Purge",pack:"500ML",std:6,dlp:1016,mrp:1598,cat:'diesel'},
+  {id:21799,name:"DEF Anti Crystal Additive Concentrate",pack:"250ML",std:6,dlp:797,mrp:1074,cat:'diesel'},
+  {id:1380,name:"Radiator Antifreeze KFS 11",pack:"1LTR",std:12,dlp:811,mrp:1066,cat:'coolant'},
+  {id:21740,name:"Radiator Antifreeze KFS 12 Evo",pack:"1LTR",std:6,dlp:1055,mrp:1427,cat:'coolant'},
+  {id:21145,name:"Radiator Antifreeze KFS 12+",pack:"1LTR",std:6,dlp:1049,mrp:1378,cat:'coolant'},
+  {id:6924,name:"Coolant Ready Mix RAF 12+",pack:"1LTR",std:12,dlp:363,mrp:555,cat:'coolant'},
+  {id:21139,name:"Radiator Antifreeze KFS 13",pack:"1LTR",std:6,dlp:862,mrp:1133,cat:'coolant'},
+  {id:1804,name:"Radiator Cleaner",pack:"300ML",std:20,dlp:414,mrp:640,cat:'coolant'},
+  {id:8956,name:"Radiator Stop Leak",pack:"150ML",std:20,dlp:471,mrp:684,cat:'coolant'},
+  {id:3091,name:"Brake Fluid DOT 4",pack:"250ML",std:6,dlp:511,mrp:652,cat:'brake'},
+  {id:3085,name:"Brake Fluid DOT 4",pack:"500ML",std:6,dlp:938,mrp:1197,cat:'brake'},
+  {id:3092,name:"Brake Fluid DOT 5.1",pack:"250ML",std:24,dlp:677,mrp:864,cat:'brake'},
+  {id:21121,name:"Brake Anti-Squeal",pack:"10GM",std:50,dlp:304,mrp:399,cat:'brake'},
+  {id:21119,name:"Brake Pin Lubricant",pack:"5GM",std:50,dlp:169,mrp:221,cat:'brake'},
+  {id:3139,name:"Battery Clamp Grease",pack:"10GM",std:50,dlp:81,mrp:117,cat:'car_care'},
+  {id:4066,name:"Air Flow Sensor Cleaner",pack:"200ML",std:6,dlp:764,mrp:1013,cat:'car_care'},
+  {id:3310,name:"Silicon Spray",pack:"300ML",std:12,dlp:437,mrp:579,cat:'car_care'},
+  {id:3110,name:"Electronic Spray",pack:"200ML",std:6,dlp:645,mrp:854,cat:'car_care'},
+  {id:3623,name:"Sealant Remover",pack:"300ML",std:6,dlp:949,mrp:1279,cat:'car_care'},
+  {id:1515,name:"Marten Spray",pack:"200ML",std:12,dlp:697,mrp:1012,cat:'car_care'},
+  {id:21345,name:"Tire Fitting Paste Black",pack:"5KG",std:1,dlp:2281,mrp:3075,cat:'car_care'},
+  {id:6112,name:"Underseal Bitumen, Black",pack:"1LTR",std:12,dlp:1500,mrp:2360,cat:'car_care'},
+  {id:21671,name:"Universal-Cleaner Extreme",pack:"20LTR",std:1,dlp:13649,mrp:18405,cat:'car_care'},
+  {id:4087,name:"A/C System Cleaner (Spray)",pack:"250ML",std:6,dlp:1151,mrp:1526,cat:'car_care'},
+  {id:21465,name:"Klima Refresh",pack:"75ML",std:12,dlp:898,mrp:1211,cat:'car_care'},
+  {id:4083,name:"PAG Air Conditioning Oil 46",pack:"250ML",std:6,dlp:1595,mrp:2150,cat:'car_care'},
+  {id:2394,name:"Hand Cleaning Paste",pack:"500ML",std:24,dlp:407,mrp:548,cat:'car_care'},
+  {id:23005,name:"Rubber Care",pack:"500ML",std:6,dlp:962,mrp:1298,cat:'car_care'},
+  {id:23003,name:"Plastic Deep Treatment",pack:"500ML",std:6,dlp:1244,mrp:1676,cat:'car_care'},
+  {id:23012,name:"Leather Care",pack:"250ML",std:6,dlp:1039,mrp:1401,cat:'car_care'},
+  {id:21634,name:"Screen Cleaner",pack:"100ML",std:24,dlp:878,mrp:1184,cat:'car_care'},
+  {id:2592,name:"Motorbike 4T Synth 5W-40 Street Race",pack:"1LTR",std:6,dlp:1356,mrp:1828,cat:'mco_oil'},
+  {id:20753,name:"Motorbike 4T Synth 10W-40 Street Race",pack:"1LTR",std:6,dlp:1180,mrp:1669,cat:'mco_oil'},
+  {id:1502,name:"Motorbike 4T Synth 10W-50 Street Race",pack:"1LTR",std:6,dlp:1098,mrp:1554,cat:'mco_oil'},
+  {id:2526,name:"Motorbike 4T 10W-30 Street",pack:"1LTR",std:6,dlp:924,mrp:1214,cat:'mco_oil'},
+  {id:1521,name:"Motorbike 4T 10W-40 Street",pack:"1LTR",std:6,dlp:951,mrp:1166,cat:'mco_oil'},
+  {id:21725,name:"Motorbike 4T 10W-50 Street",pack:"1LTR",std:6,dlp:1041,mrp:1276,cat:'mco_oil'},
+  {id:2555,name:"Motorbike 4T 15W-50 Street",pack:"1LTR",std:6,dlp:881,mrp:1157,cat:'mco_oil'},
+  {id:2722,name:"Motorbike 4T 15W-50 Street",pack:"20LTR",std:1,dlp:16157,mrp:21233,cat:'mco_oil'},
+  {id:3816,name:"Motorbike HD Synth 20W-50 Street",pack:"1LTR",std:6,dlp:1392,mrp:1876,cat:'mco_oil'},
+  {id:3817,name:"Motorbike HD Synth 20W-50 Street",pack:"4LTR",std:4,dlp:5237,mrp:6424,cat:'mco_oil'},
+  {id:3818,name:"Motorbike HD Synth 20W-50 Street",pack:"20LTR",std:1,dlp:25707,mrp:31533,cat:'mco_oil'},
+  {id:21458,name:"Motorbike 4T 10W-40 Scooter MB Formula",pack:"800ML",std:6,dlp:749,mrp:984,cat:'mco_oil'},
+  {id:3018,name:"Motorbike 4T Synth 5W-40 Offroad Race",pack:"1LTR",std:6,dlp:1485,mrp:2002,cat:'mco_oil'},
+  {id:1523,name:"Motorbike Fork Oil 5W Light",pack:"500ML",std:6,dlp:795,mrp:1071,cat:'mco_oil'},
+  {id:3099,name:"Motorbike Fork Oil 7.5W Medium/Light",pack:"500ML",std:6,dlp:771,mrp:1039,cat:'mco_oil'},
+  {id:1506,name:"Motorbike Fork Oil 10W Medium",pack:"500ML",std:6,dlp:746,mrp:1006,cat:'mco_oil'},
+  {id:1524,name:"Motorbike Fork Oil 15W Heavy",pack:"500ML",std:6,dlp:821,mrp:1106,cat:'mco_oil'},
+  {id:3444,name:"Motorbike MoS2 Shooter",pack:"20ML",std:24,dlp:266,mrp:385,cat:'mco_add'},
+  {id:20597,name:"Motorbike Engine Flush Shooter",pack:"80ML",std:24,dlp:267,mrp:388,cat:'mco_add'},
+  {id:7822,name:"Motorbike 4T Shooter",pack:"80ML",std:24,dlp:265,mrp:384,cat:'mco_add'},
+  {id:7820,name:"Motorbike Speed Shooter",pack:"80ML",std:24,dlp:470,mrp:590,cat:'mco_add'},
+  {id:1508,name:"Motorbike Chain Lube",pack:"250ML",std:12,dlp:742,mrp:1000,cat:'mco_care'},
+  {id:1602,name:"Motorbike Chain and Brake Cleaner",pack:"500ML",std:6,dlp:449,mrp:605,cat:'mco_care'},
+  {id:1591,name:"Motorbike Chain Lube White",pack:"400ML",std:6,dlp:809,mrp:1018,cat:'mco_care'},
+  {id:1603,name:"Motorbike Helmet Interior Cleaner",pack:"300ML",std:12,dlp:645,mrp:869,cat:'mco_care'},
+  {id:1579,name:"Motorbike Tire Inflator and Sealer",pack:"300ML",std:12,dlp:978,mrp:1319,cat:'mco_care'},
+  {id:1299,name:"Motorbike Foam Filter Cleaner",pack:"1LTR",std:6,dlp:1921,mrp:2590,cat:'mco_care'},
+];
+
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const DEALERS_JSON_URL = 'dealers.json'; // same folder as index.html on GitHub
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let activeCat='all', cart={}, dealerName='', userMobile='', isDealer=false, paymentType='credit';
+let DEALERS = []; // loaded from dealers.json
+const fmt=v=>v!=null?'Rs. '+Number(v).toLocaleString('en-IN'):'—';
+
+// ── LOAD DEALERS ────────────────────────────────────────────────────────────
+async function loadDealers(){
+  try{
+    const r=await fetch(DEALERS_JSON_URL+'?v='+Date.now());
+    if(r.ok) DEALERS=await r.json();
+  } catch(e){ DEALERS=[]; }
+}
+
+// ── MOBILE INPUT HANDLER ────────────────────────────────────────────────────
+function onMobileInput(val){
+  const mobile=val.replace(/\D/g,'').slice(0,10);
+  document.getElementById('mobile-input').value=mobile;
+  const btn=document.getElementById('login-btn');
+  const detectedBox=document.getElementById('dealer-detected');
+  const retailBox=document.getElementById('retail-warning');
+  document.getElementById('login-err').textContent='';
+
+  if(mobile.length===10){
+    const dealer=DEALERS.find(d=>String(d.mobile).replace(/\D/g,'')==mobile);
+    if(dealer){
+      detectedBox.style.display='block';
+      retailBox.style.display='none';
+      document.getElementById('detected-name').textContent='🏪 '+dealer.name;
+    } else {
+      detectedBox.style.display='none';
+      retailBox.style.display='block';
+      const waMsg=encodeURIComponent('Hello OilGuru Alam Enterprises! I would like to register as a dealer. My mobile number is '+mobile+'.');
+      document.getElementById('retail-wa-link').href='https://wa.me/'+WA_NUMBER+'?text='+waMsg;
+    }
+    btn.disabled=false; btn.style.opacity='1';
+  } else {
+    detectedBox.style.display='none';
+    retailBox.style.display='none';
+    btn.disabled=true; btn.style.opacity='.5';
+  }
+}
+
+function getDiscount(sub,isAdv){
+  if(!isAdv) return {pct:0,amt:0,label:''};
+  const r=DISC_RULES.find(r=>sub>=r.min);
+  if(!r) return {pct:0,amt:0,label:''};
+  return {pct:r.pct,amt:Math.round(sub*r.pct/100),label:`${r.pct}% Cash Discount`};
+}
+function cartSub(){return Object.entries(cart).reduce((s,[id,q])=>{const p=P.find(x=>x.id===+id);if(!p)return s;const px=isDealer?p.dlp:(p.mrp||p.dlp);return s+px*q;},0);}
+function cartCount(){return Object.values(cart).reduce((s,q)=>s+q,0);}
+
+function updateCartUI(){
+  const cnt=cartCount(),sub=cartSub(),disc=getDiscount(sub,paymentType==='advance'),total=sub-disc.amt;
+  const b=document.getElementById('cart-badge');
+  b.style.display=cnt>0?'flex':'none'; b.textContent=cnt;
+  document.getElementById('cart-total-nav').textContent=fmt(total);
+  document.getElementById('cart-items-nav').textContent=cnt;
+  const banner=document.getElementById('discount-banner');
+  const bannerTxt=document.getElementById('discount-banner-text');
+  if(cnt===0){banner.style.display='none';return;}
+  banner.style.display='flex';
+  if(paymentType==='advance'){
+    if(sub>=10000){
+      const saving=Math.round(sub*0.05);
+      banner.style.background='linear-gradient(90deg,#1A6B3C,#27ae60)';
+      bannerTxt.innerHTML=`🎉 <b>Pay Now & Save Rs.${saving.toLocaleString('en-IN')}!</b> 5% Cash Discount applied ✅`;
+    } else if(sub>=5000){
+      const saving3=Math.round(sub*0.03);
+      const need5=10000-sub;
+      const extra=Math.round(need5*0.05);
+      banner.style.background='linear-gradient(90deg,#1a5e8a,#2980b9)';
+      bannerTxt.innerHTML=`✅ Saving <b>Rs.${saving3.toLocaleString('en-IN')}</b> now! Add Rs.${need5.toLocaleString('en-IN')} more → save <b>Rs.${(saving3+extra).toLocaleString('en-IN')} total</b> 🚀`;
+    } else {
+      const need=5000-sub;
+      const wouldSave=Math.round(5000*0.03);
+      banner.style.background='linear-gradient(90deg,#7B3F00,#c0392b)';
+      bannerTxt.innerHTML=`💡 Add Rs.${need.toLocaleString('en-IN')} more → <b>Unlock 3% discount, save Rs.${wouldSave.toLocaleString('en-IN')}+</b>`;
+    }
+  } else {
+    // Credit mode — tease the discount
+    if(sub>=10000){
+      banner.style.background='linear-gradient(90deg,#1A6B3C,#27ae60)';
+      bannerTxt.innerHTML=`💰 Switch to <b>Advance Payment</b> → Save Rs.${Math.round(sub*0.05).toLocaleString('en-IN')} instantly (5% off)!`;
+    } else if(sub>=5000){
+      banner.style.background='linear-gradient(90deg,#1a5e8a,#2980b9)';
+      bannerTxt.innerHTML=`💰 Switch to <b>Advance Payment</b> → Save Rs.${Math.round(sub*0.03).toLocaleString('en-IN')} instantly (3% off)!`;
+    } else {
+      banner.style.background='linear-gradient(90deg,#7B3F00,#e67e22)';
+      bannerTxt.innerHTML=`💡 Add Rs.${(5000-sub).toLocaleString('en-IN')} + pay advance → unlock <b>3% Cash Discount!</b>`;
+    }
+  }
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// LOGIN
+function doLogin(){
+  const mobile=document.getElementById('mobile-input').value.replace(/\D/g,'');
+  if(mobile.length!==10){document.getElementById('login-err').textContent='Please enter a valid 10-digit number';return;}
+  userMobile=mobile;
+  const dealer=DEALERS.find(d=>String(d.mobile).replace(/\D/g,'')==mobile);
+  if(dealer){
+    isDealer=true; dealerName=dealer.name;
+    sessionStorage.setItem('og_auth','1');
+    sessionStorage.setItem('og_name',dealer.name);
+    sessionStorage.setItem('og_mobile',mobile);
+    sessionStorage.setItem('og_dealer','1');
+  } else {
+    isDealer=false; dealerName='Retail Customer ('+mobile+')';
+    sessionStorage.setItem('og_auth','1');
+    sessionStorage.setItem('og_name',dealerName);
+    sessionStorage.setItem('og_mobile',mobile);
+    sessionStorage.setItem('og_dealer','0');
+    // Notify owner on WhatsApp about unknown visitor
+    const waMsg=encodeURIComponent('⚠️ Unknown visitor on OilGuru App\nMobile: '+mobile+'\nTime: '+new Date().toLocaleString('en-IN')+'\nThey are browsing as a Retail Customer.');
+    setTimeout(()=>{ window.open('https://wa.me/'+WA_NUMBER+'?text='+waMsg,'_blank'); },800);
+  }
+  launchApp();
+}
+
+function launchApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  if(isDealer){
+    document.getElementById('dealer-bar').textContent='👤 Welcome, '+dealerName+'! Dealer prices unlocked. Tap + to add items.';
+    document.getElementById('retail-mode-bar').style.display='none';
+  } else {
+    document.getElementById('dealer-bar').style.display='none';
+    document.getElementById('retail-mode-bar').style.display='block';
+    // Also hide discount banner for retail
+    paymentType='credit';
+  }
+  renderTabs();renderList();
+}
+
+function doLogout(){sessionStorage.clear();cart={};location.reload();}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  await loadDealers();
+  if(sessionStorage.getItem('og_auth')==='1'){
+    dealerName=sessionStorage.getItem('og_name')||'Customer';
+    userMobile=sessionStorage.getItem('og_mobile')||'';
+    isDealer=sessionStorage.getItem('og_dealer')==='1';
+    launchApp();
+  }
+});
+
+// TABS
+function renderTabs(){
+  document.getElementById('cat-tabs').innerHTML=CATS.map(c=>
+    `<span class="cat-tab ${c.key==='all'?'active':''}" data-key="${c.key}" onclick="setTab('${c.key}')">${c.label}</span>`
+  ).join('');
+}
+function setTab(key){
+  activeCat=key;
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.toggle('active',t.dataset.key===key));
+  document.getElementById('search-input').value='';
+  renderList();
+}
+
+// PRODUCT LIST
+function hl(text,q){
+  if(!q)return text;
+  return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),'<mark>$1</mark>');
+}
+function qtyCtrl(id,qty){
+  if(qty===0)return `<button class="add-btn" onclick="addToCart(${id})">+ Add</button>`;
+  return `<div class="qty-ctrl"><button class="minus" onclick="changeQty(${id},-1)">−</button><span class="qty-val">${qty}</span><button class="plus" onclick="changeQty(${id},1)">+</button></div>`;
+}
+function addToCart(id){cart[id]=(cart[id]||0)+1;updateCtrl(id);updateCartUI();showToast('Added ✓');}
+function changeQty(id,d){cart[id]=Math.max(0,(cart[id]||0)+d);if(cart[id]===0)delete cart[id];updateCtrl(id);updateCartUI();}
+function updateCtrl(id){const el=document.getElementById(`ctrl-${id}`);if(el)el.innerHTML=qtyCtrl(id,cart[id]||0);}
+
+function renderList(){
+  const q=(document.getElementById('search-input')?.value||'').trim().toLowerCase();
+  const filtered=P.filter(p=>{
+    if(activeCat!=='all'&&p.cat!==activeCat)return false;
+    if(!q)return true;
+    return p.name.toLowerCase().includes(q)||p.pack.toLowerCase().includes(q)||String(p.id).includes(q)||catLabel(p.cat).toLowerCase().includes(q);
+  });
+  document.getElementById('result-bar').innerHTML=`Showing <span>${filtered.length}</span> of ${P.length} products`;
+  if(!filtered.length){document.getElementById('product-list').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div class="no-results-text">No products found</div></div>`;return;}
+  const groups={};
+  filtered.forEach(p=>{if(!groups[p.cat])groups[p.cat]=[];groups[p.cat].push(p);});
+  let html='';
+  for(const[cat,prods]of Object.entries(groups)){
+    const col=catColor(cat);
+    if(activeCat==='all')html+=`<div class="group-header"><div class="group-dot" style="background:${col}"></div><div class="group-title">${catLabel(cat)}</div><div class="group-count">${prods.length}</div></div>`;
+    prods.forEach(p=>{
+      const qty=cart[p.id]||0;
+      const priceBlock = isDealer
+        ? `<div class="price-mrp-label">MRP</div><div class="price-mrp">${p.mrp?fmt(p.mrp):'—'}</div><div class="price-dlp-label">DLP</div><div class="price-dlp">${fmt(p.dlp)}</div>`
+        : `<div class="price-mrp-label">MRP</div><div class="price-mrp">${p.mrp?fmt(p.mrp):'—'}</div><div style="font-size:9px;color:var(--muted);margin-top:2px">Dealer price hidden</div>`;
+      html+=`<div class="p-card"><div class="p-card-inner"><div class="p-card-accent" style="background:${col}"></div><div class="p-card-body"><div class="p-name">${hl(p.name,q)}</div><div class="p-meta"><span class="badge pack">${p.pack}</span><span class="badge">ID: ${hl(String(p.id),q)}</span><span class="badge">Std: ${p.std}</span></div></div><div class="p-card-right"><div>${priceBlock}</div><div id="ctrl-${p.id}">${qtyCtrl(p.id,qty)}</div></div></div></div>`;
+    });
+  }
+  document.getElementById('product-list').innerHTML=html;
+}
+
+// CART PANEL
+function openCart(){renderCartPanel();document.getElementById('cart-overlay').classList.add('open');document.getElementById('cart-panel').classList.add('open');}
+function closeCart(){document.getElementById('cart-overlay').classList.remove('open');document.getElementById('cart-panel').classList.remove('open');}
+
+function renderCartPanel(){
+  const items=Object.entries(cart).map(([id,qty])=>({p:P.find(x=>x.id===+id),qty})).filter(x=>x.p);
+  const getPrice=p=>isDealer?p.dlp:(p.mrp||p.dlp);
+  const sub=items.reduce((s,{p,qty})=>s+getPrice(p)*qty,0);
+  const disc=getDiscount(sub,isDealer&&paymentType==='advance'),total=sub-disc.amt,cnt=cartCount();
+  document.getElementById('cart-panel-sub').textContent=`${cnt} item${cnt!==1?'s':''}`;
+  if(!items.length){
+    document.getElementById('cart-body').innerHTML=`<div class="empty-cart"><div class="empty-cart-icon">🛒</div><div style="font-size:15px;font-weight:700;color:var(--text)">Your cart is empty</div><div style="font-size:12px;margin-top:6px;color:var(--muted)">Browse products and tap + to add</div></div>`;
+    document.getElementById('cart-footer').innerHTML='';return;
+  }
+  let body=items.map(({p,qty})=>{const px=isDealer?p.dlp:(p.mrp||p.dlp);return`<div class="cart-item"><div class="cart-accent" style="background:${catColor(p.cat)}"></div><div class="cart-info"><div class="cart-name">${p.name}</div><div class="cart-pack">${p.pack} · ID: ${p.id}</div><div class="cart-line-price">${fmt(px)} × ${qty} = ${fmt(px*qty)}</div></div><div class="cart-qty"><button class="minus" onclick="cartChange(${p.id},-1)">−</button><span class="cart-qty-val">${qty}</span><button class="plus" onclick="cartChange(${p.id},1)">+</button></div></div>`;}).join('');
+
+  // Payment toggle only for dealers
+  if(!isDealer){ paymentType='credit'; }
+
+  // Smart savings nudge box
+  const advSave3=Math.round(sub*0.03), advSave5=Math.round(sub*0.05);
+  const need5k=Math.max(0,5000-sub), need10k=Math.max(0,10000-sub);
+  let nudgeHtml='';
+  if(paymentType==='credit'){
+    if(sub>=10000) nudgeHtml=`<div class="nudge-box nudge-green">💰 <b>Pay Advance & Save Rs.${advSave5.toLocaleString('en-IN')}!</b><br><span>Switch to Advance Payment below to get 5% off instantly</span></div>`;
+    else if(sub>=5000) nudgeHtml=`<div class="nudge-box nudge-blue">💰 <b>Pay Advance & Save Rs.${advSave3.toLocaleString('en-IN')}!</b><br><span>Switch to Advance Payment → 3% off. Add Rs.${need10k.toLocaleString('en-IN')} more for 5% off!</span></div>`;
+    else nudgeHtml=`<div class="nudge-box nudge-orange">💡 Add Rs.${need5k.toLocaleString('en-IN')} more + pay advance to <b>save Rs.${Math.round(5000*0.03).toLocaleString('en-IN')}+</b> with 3% discount!</div>`;
+  } else {
+    if(sub>=10000) nudgeHtml=`<div class="nudge-box nudge-green">🎉 <b>Great choice! You're saving Rs.${advSave5.toLocaleString('en-IN')} with 5% Cash Discount!</b></div>`;
+    else if(sub>=5000) nudgeHtml=`<div class="nudge-box nudge-blue">✅ <b>Saving Rs.${advSave3.toLocaleString('en-IN')} with 3% discount!</b> Add Rs.${need10k.toLocaleString('en-IN')} more → upgrade to 5%, save Rs.${advSave5.toLocaleString('en-IN')} total! 🚀</div>`;
+    else nudgeHtml=`<div class="nudge-box nudge-orange">💡 Add Rs.${need5k.toLocaleString('en-IN')} more worth of items → <b>Unlock 3% Cash Discount & save Rs.${Math.round(5000*0.03).toLocaleString('en-IN')}+!</b></div>`;
+  }
+
+  body+=nudgeHtml;
+
+  // Payment toggle — dealers only
+  if(isDealer){
+    body+=`<span class="section-lbl">Payment Type</span>
+    <div class="pay-toggle">
+      <div class="pay-opt ${paymentType==='credit'?'selected':''}" onclick="setPayType('credit')">
+        <div class="pay-opt-icon">🗓️</div><div class="pay-opt-label">Credit / Later</div>
+        <div class="pay-opt-sub">No discount</div>
+      </div>
+      <div class="pay-opt ${paymentType==='advance'?'selected':''}" onclick="setPayType('advance')" style="${paymentType!=='advance'&&sub>=5000?'border-color:#27ae60;background:#e8f8ee':''}">
+        <div class="pay-opt-icon">⚡</div><div class="pay-opt-label">Advance / Cash</div>
+        <div class="pay-opt-sub" style="color:var(--green);font-weight:700">${sub>=10000?`Save Rs.${advSave5.toLocaleString('en-IN')}! (5% off)`:sub>=5000?`Save Rs.${advSave3.toLocaleString('en-IN')}! (3% off)`:'3–5% off above Rs.5k'}</div>
+      </div>
+    </div>`;
+  } else {
+    body+=`<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px 13px;margin:10px 0;font-size:12px;color:#7B3F00">
+      🛍️ <b>Retail Order</b> — Prices at MRP.<br><span style="font-size:11px">Contact OilGuru to register as a dealer and unlock better pricing!</span>
+    </div>`;
+  }
+
+  body+=`<div class="summary-box">
+    <div class="summary-row"><span class="summary-label">Subtotal (${cnt} items)</span><span class="summary-value">${fmt(sub)}</span></div>
+    ${disc.amt>0?`<div class="summary-row"><span class="summary-label summary-discount">🏷️ ${disc.label}</span><span class="summary-value summary-discount">− ${fmt(disc.amt)}</span></div><div style="text-align:right;margin-bottom:4px"><span class="disc-chip">${disc.pct}% CASH DISCOUNT APPLIED ✅</span></div>`:''}
+    <div class="summary-row divider"><span class="summary-total-lbl">Total Payable</span><span class="summary-total">${fmt(total)}</span></div>
+    ${disc.amt>0?`<div style="text-align:center;font-size:12px;color:var(--green);font-weight:600;margin-top:6px">You're saving Rs.${disc.amt.toLocaleString('en-IN')} on this order! 🎉</div>`:''}
+  </div>`;
+
+  document.getElementById('cart-body').innerHTML=body;
+  document.getElementById('cart-footer').innerHTML=`<button class="btn-primary" onclick="proceedOrder()">📋 Proceed to Place Order →</button><button class="btn-secondary" onclick="closeCart()">Continue Shopping</button>`;
+}
+
+function cartChange(id,d){cart[id]=Math.max(0,(cart[id]||0)+d);if(cart[id]===0)delete cart[id];updateCtrl(id);updateCartUI();renderCartPanel();}
+function setPayType(t){paymentType=t;updateCartUI();renderCartPanel();}
+
+// ORDER
+function proceedOrder(){
+  const items=Object.entries(cart).map(([id,qty])=>({p:P.find(x=>x.id===+id),qty})).filter(x=>x.p);
+  if(!items.length)return;
+  const sub=cartSub();
+  const disc=getDiscount(sub,isDealer&&paymentType==='advance');
+  const total=sub-disc.amt;
+  if(isDealer&&paymentType==='advance'){openUpi(total,sub,disc,items);}
+  else{sendWhatsApp(items,sub,disc,total,isDealer?'Credit / Later':'Retail / MRP',false);}
+}
+
+// UPI
+function openUpi(total,sub,disc,items){
+  document.getElementById('upi-overlay').classList.add('open');
+  document.getElementById('upi-panel').classList.add('open');
+  const enc=encodeURIComponent;
+  const upiUrl=`upi://pay?pa=${UPI_ID}&pn=${enc(UPI_NAME)}&am=${total}&cu=INR&tn=${enc('OilGuru Order-'+dealerName)}`;
+  window._pendingOrder={items,sub,disc,total};
+
+  const savingBanner = disc.amt>0
+    ? `<div style="background:linear-gradient(90deg,#1A6B3C,#27ae60);border-radius:10px;padding:10px 14px;margin:12px 0;color:#fff;font-size:13px;font-weight:700;text-align:center">
+        🎉 You are saving <span style="font-size:17px">Rs.${disc.amt.toLocaleString('en-IN')}</span> with ${disc.pct}% Cash Discount!<br>
+        <span style="font-size:11px;font-weight:400;opacity:.85">Original: Rs.${sub.toLocaleString('en-IN')} → You pay only: Rs.${total.toLocaleString('en-IN')}</span>
+       </div>`
+    : '';
+
+  document.getElementById('upi-body').innerHTML=`
+    ${savingBanner}
+    <div class="upi-amount-box">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:4px">AMOUNT TO PAY</div>
+      <div class="upi-amount">Rs.${total.toLocaleString('en-IN')}</div>
+      <div class="upi-amount-label">to ${UPI_NAME}</div>
+    </div>
+    <div class="upi-qr-wrap">
+      <div class="qr-box">
+        <div style="font-size:36px;margin-bottom:8px">📱</div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy)">Scan with any UPI App</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Or tap buttons below to pay instantly</div>
+      </div>
+    </div>
+    <div class="upi-id-box">
+      <div><div class="upi-id-label">UPI ID</div><div class="upi-id-text">${UPI_ID}</div></div>
+      <button class="copy-btn" onclick="copyUPI()">📋 Copy</button>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--text);text-align:center;margin:10px 0 8px">⚡ Tap to open your UPI app and pay instantly</div>
+    <div class="upi-apps">
+      <a class="upi-app-btn" href="${upiUrl}"><span class="upi-app-icon">💜</span><span class="upi-app-name">PhonePe</span></a>
+      <a class="upi-app-btn" href="${upiUrl}"><span class="upi-app-icon">🟢</span><span class="upi-app-name">GPay</span></a>
+      <a class="upi-app-btn" href="${upiUrl}"><span class="upi-app-icon">🔵</span><span class="upi-app-name">Paytm</span></a>
+      <a class="upi-app-btn" href="${upiUrl}"><span class="upi-app-icon">🟠</span><span class="upi-app-name">BHIM/Other</span></a>
+    </div>
+    <div class="upi-steps">
+      <b>3 easy steps:</b><br>
+      1 Tap your UPI app above — it opens automatically<br>
+      2 Pay <b>Rs.${total.toLocaleString('en-IN')}</b> and confirm in your app<br>
+      3 Come back here and tap the green button below
+    </div>`;
+
+  document.getElementById('upi-footer').innerHTML=`
+    <button class="btn-green" onclick="paymentDone()">Payment Done — Send Order on WhatsApp</button>
+    <button class="btn-secondary" onclick="closeUpi()">Back to Cart</button>`;
+}
+
+function copyUPI(){
+  const txt=UPI_ID;
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>showToast('UPI ID copied!'));}
+  else{const e=document.createElement('textarea');e.value=txt;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);showToast('UPI ID copied!');}
+}
+function closeUpi(){document.getElementById('upi-overlay').classList.remove('open');document.getElementById('upi-panel').classList.remove('open');}
+
+function paymentDone(){
+  const o=window._pendingOrder;
+  closeUpi();
+  sendWhatsApp(o.items,o.sub,o.disc,o.total,'UPI Advance — Paid ✅',true);
+}
+
+// WHATSAPP
+function sendWhatsApp(items,sub,disc,total,payMode,isPaid){
+  const d=new Date();
+  const date=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const time=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  let msg=`🛢️ *OilGuru™ Alam Enterprises*\n`;
+  msg+=`━━━━━━━━━━━━━━━━━━━━\n`;
+  msg+=`📋 *NEW ORDER*\n`;
+  msg+=`📅 ${date} at ${time}\n`;
+  msg+=`👤 *Dealer:* ${dealerName}\n`;
+  msg+=`👤 *Type:* ${isDealer?'Dealer':'Retail Customer'}\n`;
+  msg+=`💳 *Payment:* ${payMode}\n`;
+  if(isPaid)msg+=`✅ *UPI Payment Done*\n`;
+  msg+=`━━━━━━━━━━━━━━━━━━━━\n\n`;
+  msg+=`*ORDER ITEMS:*\n`;
+  items.forEach(({p,qty},i)=>{
+    msg+=`${i+1}. ${p.name} (${p.pack})\n`;
+    msg+=`   ID: ${p.id} | Qty: ${qty} | Rs.${p.dlp}×${qty} = Rs.${(p.dlp*qty).toLocaleString('en-IN')}\n`;
+  });
+  msg+=`\n━━━━━━━━━━━━━━━━━━━━\n`;
+  msg+=`*Subtotal:* Rs.${sub.toLocaleString('en-IN')}\n`;
+  if(disc.amt>0)msg+=`*${disc.label}:* − Rs.${disc.amt.toLocaleString('en-IN')}\n`;
+  msg+=`*✅ TOTAL: Rs.${total.toLocaleString('en-IN')}*\n`;
+  msg+=`━━━━━━━━━━━━━━━━━━━━\n`;
+  msg+=`📍 OilGuru™ Alam Enterprises, Lucknow\n`;
+  msg+=`📞 +91 94552 52049 | GST: 09AJJPA7779E1ZX`;
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
+  showSuccess(items,sub,disc,total,payMode,isPaid);
+}
+
+// SUCCESS
+function showSuccess(items,sub,disc,total,payMode,isPaid){
+  closeCart();closeUpi();
+  document.getElementById('success-overlay').classList.add('open');
+  document.getElementById('success-panel').classList.add('open');
+  document.getElementById('success-body').innerHTML=`
+    <div class="success-screen">
+      <div class="success-icon">${isPaid?'🎉':'✅'}</div>
+      <div class="success-title">${isPaid?'Payment & Order Sent!':'Order Sent to WhatsApp!'}</div>
+      <div class="success-sub">Your order has been sent to OilGuru Alam Enterprises on WhatsApp.<br>They will confirm shortly.</div>
+      <div class="success-order-box">
+        <div class="success-order-title">📋 Order Summary</div>
+        <div class="success-order-row"><span>Dealer</span><b>${dealerName}</b></div>
+        <div class="success-order-row"><span>Total Items</span><b>${cartCount()}</b></div>
+        <div class="success-order-row"><span>Subtotal</span><b>${fmt(sub)}</b></div>
+        ${disc.amt>0?`<div class="success-order-row"><span style="color:var(--green)">${disc.pct}% Discount</span><b style="color:var(--green)">− ${fmt(disc.amt)}</b></div>`:''}
+        <div class="success-order-row"><span><b>Total Paid</b></span><b style="font-size:16px">${fmt(total)}</b></div>
+        <div class="success-order-row"><span>Payment</span><b>${payMode}</b></div>
+      </div>
+    </div>`;
+  document.getElementById('success-footer').innerHTML=`<button class="btn-gold" onclick="newOrder()">🛒 Place Another Order</button>`;
+}
+
+function newOrder(){
+  cart={};paymentType='credit';
+  document.getElementById('success-overlay').classList.remove('open');
+  document.getElementById('success-panel').classList.remove('open');
+  updateCartUI();renderList();
+  showToast('Cart cleared. Ready for new order!');
+}
+
+// ── ADD TO HOME SCREEN ──────────────────────────────────────────────────────
+let deferredInstallPrompt = null;
+const A2HS_DISMISSED_KEY = 'og_a2hs_dismissed';
+
+function isRunningStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true
+    || document.referrer.includes('android-app://');
+}
+
+function isIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isAndroid(){
+  return /android/i.test(navigator.userAgent);
+}
+
+// Capture the install prompt on Android/Chrome
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Show banner after a short delay so user sees the app first
+  setTimeout(() => showA2HSBanner('android'), 3000);
+});
+
+// Detect successful install
+window.addEventListener('appinstalled', () => {
+  hideA2HSBanner();
+  showToast('🎉 OilGuru added to home screen!');
+  deferredInstallPrompt = null;
+});
+
+function showA2HSBanner(type) {
+  // Don't show if already installed or dismissed recently
+  if (isRunningStandalone()) return;
+  const dismissed = sessionStorage.getItem(A2HS_DISMISSED_KEY);
+  if (dismissed) return;
+
+  const banner = document.getElementById('a2hs-banner');
+  const sub = document.getElementById('a2hs-sub');
+  const btn = document.getElementById('a2hs-btn');
+
+  if (type === 'ios') {
+    sub.textContent = 'Tap Share ⎙ → "Add to Home Screen"';
+    btn.textContent = 'Show Me How';
+  } else {
+    sub.textContent = 'Open like an app — faster, no browser bar!';
+    btn.textContent = 'Add Now ➕';
+  }
+
+  banner.style.display = 'block';
+  // Push bottom-nav up so banner doesn't overlap it
+  document.querySelector('.bottom-nav').style.marginBottom = '72px';
+}
+
+function hideA2HSBanner() {
+  const banner = document.getElementById('a2hs-banner');
+  banner.style.display = 'none';
+  document.querySelector('.bottom-nav').style.marginBottom = '';
+}
+
+function dismissA2HS() {
+  hideA2HSBanner();
+  sessionStorage.setItem(A2HS_DISMISSED_KEY, '1');
+}
+
+function triggerA2HS() {
+  if (isIOS()) {
+    openIosSheet();
+  } else if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choice) => {
+      if (choice.outcome === 'accepted') {
+        hideA2HSBanner();
+        showToast('🎉 OilGuru added to home screen!');
+      } else {
+        dismissA2HS();
+      }
+      deferredInstallPrompt = null;
+    });
+  }
+}
+
+function openIosSheet() {
+  document.getElementById('ios-sheet').classList.add('open');
+}
+
+function closeIosSheet() {
+  document.getElementById('ios-sheet').classList.remove('open');
+  dismissA2HS();
+}
+
+// On page load — check if should show banner
+window.addEventListener('load', () => {
+  if (isRunningStandalone()) return; // already installed
+  const dismissed = sessionStorage.getItem(A2HS_DISMISSED_KEY);
+  if (dismissed) return;
+
+  if (isIOS()) {
+    // iOS: show after 4 seconds
+    setTimeout(() => showA2HSBanner('ios'), 4000);
+  }
+  // Android: handled by beforeinstallprompt event above
+  // For Android browsers that don't fire beforeinstallprompt (Samsung, etc.)
+  if (isAndroid() && !deferredInstallPrompt) {
+    setTimeout(() => {
+      if (!isRunningStandalone() && !deferredInstallPrompt) {
+        showA2HSBanner('android-manual');
+        document.getElementById('a2hs-sub').textContent = 'Tap browser menu ⋮ → "Add to Home Screen"';
+        document.getElementById('a2hs-btn').textContent = 'Got it 👍';
+        document.getElementById('a2hs-btn').onclick = dismissA2HS;
+      }
+    }, 5000);
+  }
+});
+</script>
+<!-- ADD TO HOME SCREEN BANNER -->
+<div id="a2hs-banner">
+  <div class="a2hs-inner">
+    <div class="a2hs-icon">🛢️</div>
+    <div class="a2hs-text">
+      <div class="a2hs-title">Add OilGuru to Home Screen</div>
+      <div class="a2hs-sub" id="a2hs-sub">Open like an app — faster & easier!</div>
+    </div>
+    <button class="a2hs-btn" id="a2hs-btn" onclick="triggerA2HS()">Add Now</button>
+    <button class="a2hs-close" onclick="dismissA2HS()" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
+<!-- iOS INSTRUCTION SHEET -->
+<div id="ios-sheet">
+  <div class="ios-overlay" onclick="closeIosSheet()"></div>
+  <div class="ios-card">
+    <div class="ios-handle"></div>
+    <div class="ios-title">📱 Add to Home Screen</div>
+    <div class="ios-sub">Follow these 3 steps to install OilGuru as an app on your iPhone:</div>
+    <div class="ios-steps">
+      <div class="ios-step">
+        <div class="ios-step-num">1</div>
+        <div class="ios-step-text">Tap the <b>Share button</b> <span style="font-size:16px">⎙</span> at the bottom of your Safari browser</div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-num">2</div>
+        <div class="ios-step-text">Scroll down and tap <b>"Add to Home Screen"</b></div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-num">3</div>
+        <div class="ios-step-text">Tap <b>"Add"</b> in the top right — done! OilGuru appears on your home screen 🎉</div>
+      </div>
+    </div>
+    <button class="ios-close-btn" onclick="closeIosSheet()">Got it ✓</button>
+  </div>
+  <div class="ios-arrow">👇</div>
+</div>
+
+</body>
+</html>
